@@ -4,7 +4,10 @@ by Eyal Assaf
 
 Stream tweets based on hashtags and compiles them into a CSV file, to be sent to UE4
 '''
-
+# -*- coding: cp1252 -*-
+# _*_ coding:utf-8 _*_
+import sys
+import io
 #Import the necessary methods from tweepy library
 import tweepy
 from tweepy.streaming import StreamListener
@@ -19,6 +22,9 @@ consumer_secret = "7D2XrKIyWt6uNMB8f2XZgRDMWb2IZlE0l37475nsNvMdQqy8ki"
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
+# prevents unicode errors - I hope
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+#sys.stderr = codecs.getwriter('utf8')(sys.stderr.buffer, 'strict')
 # confirm login into Twitter api
 print ("Successfully logged in as " + api.me().name + ".")
 
@@ -31,6 +37,45 @@ class eaTweetStreamer(StreamListener):
     def __init__(self):
         self.startStream()
         '''
+
+    def twitterStart(self):
+        # variable to get user input. Send to get_input() method
+        user_input=self.get_input(["s", "p", "q"])
+
+    def get_input(self,userChoice):
+        choice=""
+        while choice not in userChoice:
+            print("Twitter client menu - press 's' to search, 'p' to post and 'q' to quit.")
+            choice=input("-->")
+            if choice=="s":
+                self.searchHt() #go to search tweet method
+            elif choice=="p":
+                self.tweetMsg() # go to tweet message method
+
+            elif choice=="q":
+                print ("goodbye!")
+        return choice
+
+    def tweetMsg(self):
+        print("tweeting message")
+        self.twitterStart()
+
+    def searchHt(self):
+        getNum= input("Number of tweets to iterate (minimum 1):")
+        if len(getNum)>=1 and getNum.isdigit():
+            search = input("Search for a hashtag:") # get user input
+            getHt=tweepy.Cursor(api.search,q="#{0}".format(search), count=getNum)
+            for index,tweet in enumerate(getHt):
+                print(index,tweet.text)
+            self.twitterStart()
+        else:
+            print("Enter at least 1 for tweets to search!")
+            self.searchHt()
+
+
+
+
+
 
     def on_data(self, data):
         print(data)
@@ -52,4 +97,4 @@ class eaTweetStreamer(StreamListener):
 
 
 if __name__ == '__main__':
-    eaTweetStreamer().startStream()
+    eaTweetStreamer().twitterStart()
