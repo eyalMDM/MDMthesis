@@ -1,20 +1,22 @@
 '''
+
 eaStreamTwitter
 by Eyal Assaf
 
 Stream tweets based on hashtags and compiles them into a CSV file, to be sent to UE4
+
 '''
 # -*- coding: cp1252 -*-
 # _*_ coding:utf-8 _*_
 import sys
 import io
-#Import the necessary methods from tweepy library
+# Import the necessary methods from tweepy library
 import tweepy
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 
-#Variables that contains the user credentials to access Twitter API
+# Variables that contains the user credentials to access Twitter API
 access_token = "3741374896-nHOo1GxSDXzKOwrGf3zTXuIQ5azENs5RfKQxz2y"
 access_token_secret = "RiuAq559cr4DDHbt2NxdZVr1AbI7J37wdMa9IQGus8BRJ"
 consumer_key = "HNDGwz1zOHXKjWhUovAkfHzpd"
@@ -24,14 +26,14 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 # prevents unicode errors - I hope
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-#sys.stderr = codecs.getwriter('utf8')(sys.stderr.buffer, 'strict')
+# sys.stderr = codecs.getwriter('utf8')(sys.stderr.buffer, 'strict')
 # confirm login into Twitter api
-print ("Successfully logged in as " + api.me().name + ".")
+print("Successfully logged in as " + api.me().name + ".")
 
 
 
 
-    #This is a basic listener that just prints received tweets to stdout.
+# This is a basic listener that just prints received tweets to stdout.
 class eaTweetStreamer(StreamListener):
     '''
     def __init__(self):
@@ -40,7 +42,7 @@ class eaTweetStreamer(StreamListener):
 
     def twitterStart(self):
         # variable to get user input. Send to get_input() method
-        user_input=self.get_input(["s", "p", "q"])
+        self.get_input(["s", "p", "q"])
 
     def get_input(self,userChoice):
         choice=""
