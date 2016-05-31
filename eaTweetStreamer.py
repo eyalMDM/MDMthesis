@@ -2,6 +2,7 @@
 
 eaStreamTwitter
 by Eyal Assaf
+v0.1
 
 Stream tweets based on hashtags and compiles them into a CSV file, to be sent to UE4
 
@@ -66,9 +67,15 @@ class eaTweetStreamer(StreamListener):
         getNum= input("Number of tweets to iterate (minimum 1):")
         if len(getNum)>=1 and getNum.isdigit():
             search = input("Search for a hashtag:") # get user input
-            getHt=tweepy.Cursor(api.search,q="#{0}".format(search), count=getNum)
+
+            getHt=api.search(q="#{0}".format(search), count=getNum)
             for index,tweet in enumerate(getHt):
                 print(index,tweet.text)
+            '''
+            # Only iterate through the first 200 statuses
+            for status in tweepy.Cursor(api.user_timeline).items(getNum):
+                process_status(status)
+            '''
             self.twitterStart()
         else:
             print("Enter at least 1 for tweets to search!")
