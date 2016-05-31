@@ -16,6 +16,7 @@ import tweepy
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+import time
 
 # Variables that contains the user credentials to access Twitter API
 access_token = "3741374896-nHOo1GxSDXzKOwrGf3zTXuIQ5azENs5RfKQxz2y"
@@ -64,27 +65,68 @@ class eaTweetStreamer(StreamListener):
         self.twitterStart()
 
     def searchHt(self):
-        getNum= input("Number of tweets to iterate (minimum 1):")
-        if len(getNum)>=1 and getNum.isdigit():
+        numTweets= input("Number of tweets to iterate (minimum 1):")
+        if len(numTweets)>=1 and numTweets.isdigit():
             search = input("Search for a hashtag:") # get user input
 
-            getHt=api.search(q="#{0}".format(search), count=getNum)
+            getHt=api.search(q="#{0}".format(search), count=numTweets)
+            #self.startStream(search)
+            '''
             for index,tweet in enumerate(getHt):
                 print(index,tweet.text)
             '''
             # Only iterate through the first 200 statuses
-            for status in tweepy.Cursor(api.user_timeline).items(getNum):
-                process_status(status)
-            '''
+            for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets),)):
+                print(index,tweet.text)
+                print("location: {0}".format(tweet.user.location))
+                print()
+                print("created: ",tweet.user.created_at)
+                print("Time zone: ", tweet.user.time_zone)
+                print("Place: ", tweet.place)
+                self.on_status(tweet)
+                #self.on_data(tweet)
+
+                print("============================")
+
             self.twitterStart()
         else:
             print("Enter at least 1 for tweets to search!")
             self.searchHt()
 
+    def on_status(self, status):
+
+        if status.coordinates:
+            print('coords:', status.coordinates)
+        if status.place:
+            print('place:', status.place.full_name)
+
+        return True
+
+    on_event = on_status
+
+    def on_error(self, status):
+        print("ERROR:" ,status)
+
+    def on_data(self, data):
+        print(data)
+        return True
+
+    def startStream(self,search):
+        #This handles Twitter authetification and the connection to Twitter Streaming API
+        l = eaTweetStreamer()
+        auth = OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
+        stream = Stream(auth, l)
+
+        #This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'
+        stream.filter(track=[search])
+        return True
 
 
 
+'''
 
+IS THIS EVEN NEEDED?
 
     def on_data(self, data):
         print(data)
@@ -103,7 +145,7 @@ class eaTweetStreamer(StreamListener):
         #This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'
         stream.filter(track=['zika'])
 
-
+'''
 
 if __name__ == '__main__':
     eaTweetStreamer().twitterStart()
