@@ -90,7 +90,7 @@ class eaTweetStreamer(StreamListener):
                 headers = ['user','created_at', 'tweet_text']
 
                 #write the row of headings to our CSV file
-                writer.writerow(headers)
+                w.writerow(headers)
 
 
                 for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets),)):
@@ -101,7 +101,7 @@ class eaTweetStreamer(StreamListener):
                     print("Time zone: ", tweet.user.time_zone)
                     print("Place: ", tweet.place)
                     print("============================")
-                    print("RAW DATA:")
+                    #print("RAW DATA:")
                     #tUser=tweet.user
                     #print(tUser)
 
