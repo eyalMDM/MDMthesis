@@ -40,11 +40,6 @@ outfile_path='C:/Users/Eyal/Documents/GitHub/MDMthesis/test.csv'
 # open it up, the w means we will write to it
 writer = csv.writer(open(outfile_path, 'w'))
 
-#create a list with headings for our columns
-headers = ['user', 'tweet_text']
-
-#write the row of headings to our CSV file
-writer.writerow(headers)
 
 
 # This is a basic listener that just prints received tweets to stdout.
@@ -88,34 +83,38 @@ class eaTweetStreamer(StreamListener):
                 print(index,tweet.text)
             '''
             # Only iterate through the first 200 statuses
-            for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets),)):
-                print(index,tweet.text)
-                print("location: {0}".format(tweet.user.location))
-                print()
-                print("created: ",tweet.user.created_at)
-                print("Time zone: ", tweet.user.time_zone)
-                print("Place: ", tweet.place)
-                print("============================")
-                print("RAW DATA:")
-                tUser=tweet.user
-                print(tUser)
+            with open(outfile_path,"w") as acsv:
+                w=csv.writer(acsv)
+                #w.writerow(("User","Text"))
+                #create a list with headings for our columns
+                headers = ['user','created_at', 'tweet_text']
+
+                #write the row of headings to our CSV file
+                writer.writerow(headers)
+
+
+                for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets),)):
+                    print(index,tweet.text)
+                    print("location: {0}".format(tweet.user.location))
+                    print()
+                    print("created: ",tweet.user.created_at)
+                    print("Time zone: ", tweet.user.time_zone)
+                    print("Place: ", tweet.place)
+                    print("============================")
+                    print("RAW DATA:")
+                    #tUser=tweet.user
+                    #print(tUser)
 
 
 
-                row = []
+                    #once you have all the cells in there, write the row to your csv
+                    w.writerow((tweet.user.screen_name,tweet.user.created_at,tweet.text.encode('utf-8')))
 
 
-                row.append(tweet.user.screen_name)
-                row.append(tweet.created_at)
-                row.append(tweet.text.encode('utf-8'))
-                #once you have all the cells in there, write the row to your csv
-                writer.writerow(row)
+                    self.on_status(tweet)
+                    #self.on_data(tweet)
 
-
-                self.on_status(tweet)
-                #self.on_data(tweet)
-
-                print("============================")
+                    print("============================")
 
             self.twitterStart()
         else:
