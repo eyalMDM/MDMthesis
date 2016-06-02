@@ -35,7 +35,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 print("Successfully logged in as " + api.me().name + ".")
 
 # tell computer where to put CSV
-outfile_path='C:/Users/Eyal/Documents/GitHub/MDMthesis/test.csv'
+outfile_path='D:/GITHUB/MDMthesis/test.csv'
 
 # open it up, the w means we will write to it
 writer = csv.writer(open(outfile_path, 'w'))
@@ -87,28 +87,41 @@ class eaTweetStreamer(StreamListener):
                 w=csv.writer(acsv)
                 #w.writerow(("User","Text"))
                 #create a list with headings for our columns
-                headers = ['user','created_at', 'tweet_text']
+                headers = ['user','created_at', 'location','coordinates','tweet_text']
 
                 #write the row of headings to our CSV file
                 w.writerow(headers)
 
 
-                for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets),)):
-                    print(index,tweet.text)
+                for index,tweet in enumerate(tweepy.Cursor(api.search,q=search).items(int(numTweets))):
+                    coded=tweet.text.encode('utf-8')
+                    cleanTweet=str(coded)
+                    loc=tweet.user.location.encode('utf-8')
+                    location=str(loc)
+                    print(index,cleanTweet[2:-1])
                     print("location: {0}".format(tweet.user.location))
                     print()
-                    print("created: ",tweet.user.created_at)
+                    print("created: ",tweet.created_at)
                     print("Time zone: ", tweet.user.time_zone)
                     print("Place: ", tweet.place)
+                    #print("Place: ", tweet.coordinates)
                     print("============================")
                     #print("RAW DATA:")
                     #tUser=tweet.user
                     #print(tUser)
+                    user_coordinates=tweet.coordinates
 
+                    if user_coordinates is None:
+                        final_coordinates=user_coordinates
+                    else:
+                        dictCoords=tweet.coordinates
+                        listCoords=dictCoords['coordinates']
+                        final_coordinates=[listCoords[0],listCoords[1]]
+                        print("coordinates:" ,final_coordinates)
 
 
                     #once you have all the cells in there, write the row to your csv
-                    w.writerow((tweet.user.screen_name,tweet.user.created_at,tweet.text.encode('utf-8')))
+                    w.writerow((tweet.user.screen_name,tweet.created_at,location[2:-1],final_coordinates,cleanTweet[2:-1]))
 
 
                     self.on_status(tweet)

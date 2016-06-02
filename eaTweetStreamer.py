@@ -35,7 +35,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 print("Successfully logged in as " + api.me().name + ".")
 
 # tell computer where to put CSV
-outfile_path='C:/Users/Eyal/Documents/GitHub/MDMthesis/test.csv'
+outfile_path='D:/GITHUB/MDMthesis/test.csv'
 
 # open it up, the w means we will write to it
 writer = csv.writer(open(outfile_path, 'w'))
